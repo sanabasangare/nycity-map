@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NYC | Subway & Attractions Map</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/icons.css">
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+    <!-- Knockout.js -->
+    <script src="js/lib/knockout-3.4.0.js"></script>
+
+    <!-- Google Libraries -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCGghI-51R1zyUw9n8V5-kBWkuBMUKzwdM&libraries=places"></script>
+
+    <script src="js/main.js"></script>
+</head>
+
+<body>
+    <div class="header">
+        <p> NYC | Subway & Attractions map</p>
+    </div>
+    <input id="input" type="text" placeholder="Look for attractions">
+    <div id="map"></div>
+    <div id="list">
+        <ul data-bind="foreach: placeArray" class="list-group">
+            <li data-bind="click: $parent.clickMarker" class="list-group-item">
+                <p class="attractions"><span data-bind="text: name"></span></p>
+                <p class="address"><span data-bind="text: address"></span></p>
+            </li>
+        </ul>
+    </div>
+    <div id="subway-lines">
+        <ul>
+            <li>
+                <div class="line-selector-icon icon-1">1</div>
+            </li>
+            <li>
+                <div class="line-selector-icon icon-2">2</div>
+            </li>
+            <li>
+                <div class="line-selector-icon icon-3">3</div>
+            </li>
+            <li>
+                <div class="line-selector-icon icon-4">4</div>
+            </li>
+            <li>
+                <div class="line-selector-icon icon-5">5</div>
+            </li>
+            <li>
+                <div class="line-selector-icon icon-6">6</div>
+            </li>
+            <li>
+                <div class="line-selector-icon icon-7">7</div>
+            </li>
+            <li>
+                <div class="line-selector-icon icon-A">A</div>
+            </li>
+            <li>
+                <div class="line-selector-icon icon-B">B</div>
+            </li>
+            <li>
+                <div class="line-selector-icon icon-C">C</div>
+            </li>
+            <li>
+                <div class="line-selector-icon icon-D">D</div>
+            </li>
+            <li>
+                <div class="line-selector-icon icon-E">E</div>
+            </li>
+            <li>
+                <div class="line-selector-icon icon-F">F</div>
+            </li>
+            <li>
+                <div class="line-selector-icon icon-L">L</div>
+            </li>
+            <li>
+                <div class="line-selector-icon icon-M">M</div>
+            </li>
+            <li>
+                <div class="line-selector-icon icon-N">N</div>
+            </li>
+            <li>
+                <div class="line-selector-icon icon-S">S</div>
+            </li>
+            <li>
+                <div class="line-selector-icon icon-Q">Q</div>
+            </li>
+            <li>
+                <div class="line-selector-icon icon-R">R</div>
+            </li>
+            <li>
+                <div class="line-selector-icon icon-J">J</div>
+            </li>
+            <li>
+                <div class="line-selector-icon icon-Z">Z</div>
+            </li>
+        </ul>
+    </div>
+    <!-- Weather template -->
+    <div id="weather" class="weather">
+        <div class="weather_date">DATE</div>
+        <div class="weather_temp">
+            <div class="weather_temp_min">MIN</div>
+            <div class="weather_temp_max">MAX</div>
+        </div>
+        <img class="weather_icon">
+        <div class="weather_text"></div>
+    </div>
+</body>
+
+</html>
