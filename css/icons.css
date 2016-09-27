@@ -1,0 +1,75 @@
+/*************** Line-controls ***************/
+
+#subway-lines {
+    position: fixed;
+    bottom: 50px;
+    left: 10px;
+    width: 25px;
+    color: #fff;
+}
+
+#subway-lines ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.line-selector-icon {
+    text-align: center;
+    width: 25px;
+    height: 25px;
+    border-radius: 25px;
+    line-height: 25px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+
+
+/*************** Subway icons ***************/
+
+.icon-1,
+.icon-2,
+.icon-3 {
+    background-color: #E32;
+}
+
+.icon-4,
+.icon-5,
+.icon-6,
+.icon-6X,
+.icon-5X {
+    background-color: #093;
+}
+
+.icon-A,
+.icon-C,
+.icon-E {
+    background-color: #00F;
+}
+
+.icon-B,
+.icon-D,
+.icon-F,
+.icon-M {
+    background-color: #F70;
+}
+
+.icon-S,
+.icon-L {
+    background-color: #AAA;
+}
+
+.icon-7 {
+    background-color: #808;
+}
+
+.icon-J,
+.icon-Z {
+    background-color: #840;
+}
+
+.icon-N,
+.icon-Q,
+.icon-R {
+    background-color: #fd5;
+    color: #000;
+}
