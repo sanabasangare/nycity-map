@@ -5,6 +5,20 @@ body {
     padding: 0;
 }
 
+#input {
+    background-color: #FFF;
+    color: #06F;
+    height: 30px;
+    right: 10px;
+    margin-top: 65px;
+    margin-right: 1%;
+    position: fixed;
+    padding: 0 11px 0 13px;
+    text-overflow: ellipsis;
+    font: 14px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+    width: 25%;
+}
+
 .header {
     background-color: #06F;
     color: #000;
@@ -23,17 +37,6 @@ body {
     height: 100%;
     margin: 0;
     padding: 0;
-}
-
-#input {
-    font-size: 14px;
-    margin-left: 0;
-    padding: 0 11px 0 13px;
-    text-overflow: ellipsis;
-    width: 25%;
-    background-color: #FFF;
-    color: #06F;
-    margin-top: 64px;
 }
 
 #list {
