@@ -9,29 +9,33 @@ body {
     background-color: #FFF;
     color: #06F;
     height: 30px;
-    right: 10px;
-    margin-top: 65px;
+    margin-top: 15px;
     margin-right: 1%;
     position: fixed;
     padding: 0 11px 0 13px;
     text-overflow: ellipsis;
-    font: 14px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+    font: 12px 'Helvetica Neue', Arial, Helvetica, sans-serif;
     width: 25%;
 }
 
 .header {
     background-color: #06F;
-    color: #000;
+    color: #FFF;
+    font-weight: 600;
     text-align: center;
-    height: 20px;
+    height: 60px;
+    width: 165px;
+    padding: 3px 3px 0 5px;
     z-index: 2;
-    right: 10px;
-    margin-left: 75%;
-    margin-top: 15px;
+    margin-right: 10px;
+    top: 10px;
     position: fixed;
-    width: 25%;
     overflow: auto;
     font-family: Arial, Helvetica, sans-serif;
+}
+
+.header:hover {
+    background-color: #000;
 }
 
 #map {
@@ -43,20 +47,15 @@ body {
 #list {
     font-size: 12px;
     font-weight: 600;
-    margin-left: 12px;
-    padding: 0 10px 0 0;
+    margin-bottom: 90px;
+    margin-right: 1%;
     overflow: auto;
-    width: 26%;
-    height: 62%;
+    width: 25%;
+    height: 500px;
 }
 
 li:hover {
     background-color: #000;
-}
-
-img {
-    max-width: 100px;
-    margin-top: -7px;
 }
 
 p.attractions {
@@ -70,11 +69,13 @@ p.address {
 }
 
 .weather {
-    top: 82%;
-    left: 80%;
+    top: 68px;
+    left: 40px;
     position: fixed;
     display: none;
-    width: 90px;
+    width: 80px;
+    font-size: 12px;
+    font-weight: 900;
     text-align: center;
     background-color: #FFF;
 }
@@ -82,8 +83,8 @@ p.address {
 .weather_date {
     background-color: #06F;
     color: #fff;
-    height: 1.2em;
-    margin: 0.2em;
+    height: 1.8em;
+    padding: 0.2em;
 }
 
 .weather_temp {
@@ -107,7 +108,7 @@ p.address {
 }
 
 .weather_text {
-    font-size: 70%;
+    font-weight: 900;
     color: #06F;
     padding: 3px;
 }
