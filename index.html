@@ -4,32 +4,26 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no'>
     <title>NYC | Subway & Attractions Map</title>
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="css/icons.css">
     <!-- Bootstrap -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-
-    <!-- Knockout.js -->
-    <script src="js/lib/knockout-3.4.0.js"></script>
-
-    <!-- Google Libraries -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCGghI-51R1zyUw9n8V5-kBWkuBMUKzwdM&libraries=places"></script>
-
-    <script src="js/main.js"></script>
 </head>
 
 <body>
     <div class="header">
-        <p> NYC | Subway & Attractions map</p>
+        <p>NYC</p>
+        <p> Subway & Attractions</p>
     </div>
-    <input id="input" type="text" placeholder="Look for attractions">
     <div id="map"></div>
+    <div class='filter-ctrl'>
+        <input id='input' name='filter' placeholder='Filter by name...' data-bind="value: query, valueUpdate: 'keyup'"/>
+    </div>
     <div id="list">
-        <ul data-bind="foreach: placeArray" class="list-group">
-            <li data-bind="click: $parent.clickMarker" class="list-group-item">
+        <ul data-bind="foreach: placeArray">
+            <li data-bind="click: $parent.clickMarker" class="list-group-item" id="item">
                 <p class="attractions"><span data-bind="text: name"></span></p>
                 <p class="address"><span data-bind="text: address"></span></p>
             </li>
@@ -112,6 +106,32 @@
         <img class="weather_icon">
         <div class="weather_text"></div>
     </div>
+
+    <!-- loading google maps asynchronously -->
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCGghI-51R1zyUw9n8V5-kBWkuBMUKzwdM&libraries=places&callback=initMap">
+    </script>
+
+    <script>
+    //Set google map API with its properties like map center, default map type, zoom etc...
+    function initMap() {
+        var lat_lng = {
+            lat: 40.761275,
+            lng: -73.965567
+        };
+        var map = new google.maps.
+        Map(document.getElementById("map"), {
+            center: lat_lng, //Set default lat and lng
+            zoom: 5, //Set default zoom
+            mapTypeId: google.maps.MapTypeId.ROADMAP //Set default map type
+        });
+    }
+    </script>
+    <!-- Knockout.js -->
+    <script src="js/lib/knockout-3.4.0.js"></script>
+    <!-- Jquery Libraries -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+
+    <script src="js/main.js"></script>
 </body>
 
 </html>
