@@ -1,4 +1,4 @@
-function mapviewModel() {
+function MapViewModel() {
     var self = this;
     var map;
     var service;
@@ -7,18 +7,35 @@ function mapviewModel() {
     var markers = [];
     var Location = {};
     var nyc = new google.maps.LatLng(40.761275, -73.965567);
+    var Input = document.getElementById('input');
 
-
-    // The window array for knockout.
+    // The array for knockout.
     self.placeArray = ko.observableArray([]);
+    self.query = ko.observable('');
+
+
+    // Filter markers
+    function input(value) {
+        MapViewModel.markers.removeAll();
+        for (var i in placeArray) {
+            if (placeArray[i].name.toLowerCase().indexOf(value.toLowerCase()) >= 0) {
+                MapViewModel.markers.push(markers[i]);
+            }
+        }
+    }
+
+    // Removes the markers from the map when user chose an autocomplete search.
+    function clearMarkers() {
+        for (var i = 0; i < markers.length; i++) {
+            markers[i].setMap(null);
+        }
+        markers = [];
+    }
+
 
     // This function loads the map.
     function initMap() {
-        map = new google.maps.Map(document.getElementById('map'), {
-            center: nyc,
-            zoom: 5,
-            mapTypeId: google.maps.MapTypeId.ROADMAP
-        });
+        map = new google.maps.Map(document.getElementById('map'), {});
         // Look for attractions within 4500 radius.
         var request = {
             location: nyc,
@@ -67,51 +84,6 @@ function mapviewModel() {
             var bounds = map.getBounds();
             searchBox.setBounds(bounds);
         });
-
-
-        //Get current NYC Weather in Farenheint
-
-        var url = 'https://query.yahooapis.com/v1/public/yql';
-        var yql = 'select title, units.temperature, item.forecast from weather.forecast where woeid in (select woeid from geo.places where text="New York, NY") and u = "F" limit 1| sort(field="item.forecast.date", descending="false");';
-
-        var iconUrl = 'https://s.yimg.com/zz/combo?a/i/us/we/52/';
-
-        $.ajax({ url: url, data: { format: 'json', q: yql }, method: 'GET', dataType: 'json' })
-            .success(function(data) {
-                if (data.query.count > 1) {
-                    jQuery.each(data.query.results.channel, function(idx, result) {
-                        console.log(idx);
-                        var f = result.item.forecast;
-                        var u = result.units.temperature;
-
-                        var c = $('#weather').clone();
-                        c.find('.weather_date').text(f.date);
-                        c.find('.weather_temp_min').text(f.low + u);
-                        c.find('.weather_temp_max').text(f.high + u);
-                        c.find('.weather_icon').attr('src', iconUrl + f.code + '.gif');
-                        c.find('.weather_text').text(f.text);
-
-                        c.css('display', 'inline-block');
-
-                        c.appendTo($('body'));
-                    });
-                } else {
-                    var f = data.query.results.channel.item.forecast;
-                    var u = data.query.results.channel.units.temperature;
-
-                    var c = $('#weather').clone();
-                    c.find('.weather_date').text(f.date);
-                    c.find('.weather_temp_min').text(f.low + u);
-                    c.find('.weather_temp_max').text(f.high + u);
-                    c.find('.weather_icon').attr('src', iconUrl + f.code + '.gif');
-                    c.find('.weather_text').text(f.text);
-
-                    c.css('display', 'inline-block');
-
-                    c.appendTo($('body'));
-                }
-            });
-
     }
 
     // Adds markers to the map.
@@ -148,7 +120,6 @@ function mapviewModel() {
         return marker;
     }
 
-
     // Get results for each location.
     function callback(results, status) {
         if (status == google.maps.places.PlacesServiceStatus.OK) {
@@ -172,10 +143,11 @@ function mapviewModel() {
                 marker = markers[i];
             }
         }
+        self.getFoursquareInfo(place);
         map.panTo(marker.position);
 
         setTimeout(function() {
-            var contentString = '<div style="font-weight: 300">' + place.name + '</div><div>' + place.address + '</div>';
+            var contentString = '<div style="font-weight: 600">' + place.name + '</div><div>' + place.address + '</div>' + self.fourSquareAPI;
             infowindow.setContent(contentString);
             infowindow.open(map, marker);
             marker.setAnimation(google.maps.Animation.DROP);
@@ -199,13 +171,42 @@ function mapviewModel() {
         self.placeArray.push(Location);
     }
 
-    // Removes the markers from the map when user chose an autocomplete search.
-    function clearMarkers() {
-        for (var i = 0; i < markers.length; i++) {
-            markers[i].setMap(null);
-        }
-        markers = [];
-    }
+    // The string to hold foursquare API.
+    self.fourSquareAPI = '';
+
+    // Foursquare API
+    this.getFoursquareInfo = function(point) {
+        var foursquare = 'https://api.foursquare.com/v2/venues/search' +
+            '?client_id=2KVAKQAUDSURSUZUEIR0BEMGXOEU3KUB4TLV2GWZ4I2UGFTE' +
+            '&client_secret=JIJBDDQOFGOCJLZ2PAICTU134SDLECEJSH0G3R5BT14HVDVN' +
+            '&ll=40.761275,-73.965567' +
+            '&query=\'' + point['name'] + '\'&limit=10' +
+            '&v=20161016';
+
+        //Start ajax and get venues name, phone number and website.
+        $.getJSON(foursquare).done(function(response) {
+            self.fourSquareAPI = '<hr>' + '<u>Foursquare Info:</u>' + '<br>';
+            var venue = response.response.venues[0];
+            var venueName = venue.name;
+
+            if (venueName !== null && venueName !== undefined) {
+                self.fourSquareAPI += 'Name: ' + venueName + '<br>';
+            } else {
+                self.fourSquareAPI += venue.name;
+            }
+
+            var phoneNumber = venue.contact.formattedPhone;
+            if (phoneNumber !== null && phoneNumber !== undefined) {
+                self.fourSquareAPI += 'Phone: ' + phoneNumber + ' ';
+            } else {
+                self.fourSquareAPI += 'Phone not available' + ' ';
+            }
+        }).fail(function(jqxhr, textStatus, error) {
+            var err = textStatus + ", " + error;
+            console.log("This Request Failed, please reload. Error:" + err);
+        });
+    };
+
 
     // Ensures the location bounds get updated when the page is resized.
     google.maps.event.addDomListener(window, 'resize', function() {
@@ -218,5 +219,69 @@ function mapviewModel() {
 }
 
 $(function() {
-    ko.applyBindings(new mapviewModel());
+    ko.applyBindings(new MapViewModel());
+});
+
+//Get current NYC Weather in Farenheint
+var url = 'https://query.yahooapis.com/v1/public/yql';
+var yql = 'select title, units.temperature, ' +
+    'item.forecast from weather.forecast ' +
+    'where woeid in (select woeid from geo.places where text="New York, NY") ' +
+    'and u = "F" limit 1| sort(field="item.forecast.date", descending="false");';
+
+var iconUrl = 'https://s.yimg.com/zz/combo?a/i/us/we/52/';
+
+$.ajax({
+        url: url,
+        data: {
+            format: 'json',
+            q: yql
+        },
+        method: 'GET',
+        dataType: 'json'
+    })
+    .success(function(data) {
+        if (data.query.count > 1) {
+            jQuery.each(data.query.results.channel, function(idx, result) {
+                console.log(idx);
+                var f = result.item.forecast;
+                var u = result.units.temperature;
+
+                var c = $('#weather').clone();
+                c.find('.weather_date').text(f.date);
+                c.find('.weather_temp_min').text(f.low + u);
+                c.find('.weather_temp_max').text(f.high + u);
+                c.find('.weather_icon').attr('src', iconUrl + f.code + '.gif');
+                c.find('.weather_text').text(f.text);
+
+                c.css('display', 'inline-block');
+
+                c.appendTo($('body'));
+            });
+        } else {
+            var f = data.query.results.channel.item.forecast;
+            var u = data.query.results.channel.units.temperature;
+
+            var c = $('#weather').clone();
+            c.find('.weather_date').text(f.date);
+            c.find('.weather_temp_min').text(f.low + u);
+            c.find('.weather_temp_max').text(f.high + u);
+            c.find('.weather_icon').attr('src', iconUrl + f.code + '.gif');
+            c.find('.weather_text').text(f.text);
+
+            c.css('display', 'inline-block');
+
+            c.appendTo($('body'));
+        }
+    });
+
+
+
+$(document).ready(function() {
+    $("input").keydown(function() {
+        $("input").css("background-color", "#6CF");
+    });
+    $("input").keyup(function() {
+        $("input").css("background-color", "#000");
+    });
 });
