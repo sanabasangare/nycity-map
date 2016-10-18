@@ -9,19 +9,25 @@ body {
     background-color: #FFF;
     color: #06F;
     height: 30px;
+    width: 20%;
     margin-top: 15px;
     margin-right: 1%;
     position: fixed;
-    padding: 0 11px 0 13px;
+    padding: 10px;
     text-overflow: ellipsis;
     font: 12px 'Helvetica Neue', Arial, Helvetica, sans-serif;
-    width: 25%;
+}
+
+@media only screen and (max-width: 590px) {
+    #input {
+        width: 150px;
+    }
 }
 
 .header {
     background-color: #06F;
     color: #FFF;
-    font-weight: 600;
+    font-weight: 100;
     text-align: center;
     height: 60px;
     width: 165px;
@@ -51,7 +57,13 @@ body {
     margin-right: 1%;
     overflow: auto;
     width: 25%;
-    height: 500px;
+    height: 70%;
+}
+
+@media only screen and (max-width: 590px) {
+    #list {
+        width: 150px;
+    }
 }
 
 li:hover {
@@ -75,7 +87,7 @@ p.address {
     display: none;
     width: 80px;
     font-size: 12px;
-    font-weight: 900;
+    font-weight: 300;
     text-align: center;
     background-color: #FFF;
 }
@@ -108,7 +120,8 @@ p.address {
 }
 
 .weather_text {
-    font-weight: 900;
+    font-weight: 300;
     color: #06F;
     padding: 3px;
 }
+
