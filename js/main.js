@@ -1,93 +1,106 @@
-function MapViewModel() {
-    var self = this;
-    var map;
-    var service;
-    var infowindow;
-    var address;
-    var markers = [];
-    var Location = {};
-    var nyc = new google.maps.LatLng(40.761275, -73.965567);
-    var Input = document.getElementById('input');
+var markers = [];
+var map;
+var service;
+var infowindow;
+var address;
+var Location = {};
+var nyc;
 
-    // The array for knockout.
-    self.placeArray = ko.observableArray([]);
-    self.query = ko.observable('');
+// This function loads the map.
+function initMap() {
+    nyc = new google.maps.LatLng(40.761275, -73.965567);
+    map = new google.maps.Map(document.getElementById('map'), {});
+    // Look for attractions within 4500 radius.
+    var request = {
+        location: nyc,
+        radius: 4500,
+        types: ['museum', 'attractions', 'art gallery']
+    };
+
+    // MTA Transit data layer
+    var transitLayer = new google.maps.TransitLayer();
+    transitLayer.setMap(map);
+
+    // Location information is provided in the marker’s infoWindow.
+    infowindow = new google.maps.InfoWindow();
+
+    service = new google.maps.places.PlacesService(map);
+    service.nearbySearch(request, callback);
+
+    // list the attractions.
+    var list = (document.getElementById('list'));
 
 
-    // Filter markers
-    function input(value) {
-        MapViewModel.markers.removeAll();
-        for (var i in placeArray) {
-            if (placeArray[i].name.toLowerCase().indexOf(value.toLowerCase()) >= 0) {
-                MapViewModel.markers.push(markers[i]);
+    map.controls[google.maps.ControlPosition.RIGHT_CENTER].push(list);
+
+    var input = (document.getElementById('input'));
+    map.controls[google.maps.ControlPosition.TOP_RIGHT].push(input);
+    var searchBox = new google.maps.places.SearchBox((input));
+
+    google.maps.event.addListener(searchBox, 'places_changed', function() {
+        var places = searchBox.getPlaces();
+        clearMarkers();
+        self.placeArray.removeAll();
+        var bounds = new google.maps.LatLngBounds();
+
+        for (var i = 0, place; i <= 10; i++) {
+            if (places[i] !== undefined) {
+                place = places[i];
+                Locations(place);
+                addMarker(place);
+                bounds.extend(place.geometry.location);
             }
         }
-    }
+        map.fitBounds(bounds);
 
-    // Removes the markers from the map when user chose an autocomplete search.
-    function clearMarkers() {
-        for (var i = 0; i < markers.length; i++) {
-            markers[i].setMap(null);
-        }
-        markers = [];
-    }
+    });
+    google.maps.event.addListener(map, 'bounds_changed', function() {
+        var bounds = map.getBounds();
+        searchBox.setBounds(bounds);
+    });
 
+    // Ensures the location bounds get updated when the page is resized.
+    google.maps.event.addDomListener(window, 'resize', function() {
+        map.setCenter(nyc);
+    });
+}
 
-    // This function loads the map.
-    function initMap() {
-        map = new google.maps.Map(document.getElementById('map'), {});
-        // Look for attractions within 4500 radius.
-        var request = {
-            location: nyc,
-            radius: 4500,
-            types: ['museum', 'attractions', 'art gallery']
-        };
-
-        // MTA Transit data layer
-        var transitLayer = new google.maps.TransitLayer();
-        transitLayer.setMap(map);
-
-        // Location information is provided in the marker’s infoWindow.
-        infowindow = new google.maps.InfoWindow();
-
-        service = new google.maps.places.PlacesService(map);
-        service.nearbySearch(request, callback);
-
-        // list the attractions.
-        var list = (document.getElementById('list'));
-
-
-        map.controls[google.maps.ControlPosition.RIGHT_CENTER].push(list);
-
-        var input = (document.getElementById('input'));
-        map.controls[google.maps.ControlPosition.TOP_RIGHT].push(input);
-        var searchBox = new google.maps.places.SearchBox((input));
-
-        google.maps.event.addListener(searchBox, 'places_changed', function() {
-            var places = searchBox.getPlaces();
-            clearMarkers();
-            self.placeArray.removeAll();
-            var bounds = new google.maps.LatLngBounds();
-
-            for (var i = 0, place; i <= 10; i++) {
-                if (places[i] !== undefined) {
-                    place = places[i];
-                    Locations(place);
-                    addMarker(place);
-                    bounds.extend(place.geometry.location);
-                }
-            }
+// Get results for each location.
+function callback(results, status) {
+        if (status == google.maps.places.PlacesServiceStatus.OK) {
+            bounds = new google.maps.LatLngBounds();
+            results.forEach(function(place) {
+                place.marker = addMarker(place);
+                bounds.extend(new google.maps.LatLng(
+                    place.geometry.location.lat(),
+                    place.geometry.location.lng()));
+            });
             map.fitBounds(bounds);
+            results.forEach(Locations);
+        }
+}
 
-        });
-        google.maps.event.addListener(map, 'bounds_changed', function() {
-            var bounds = map.getBounds();
-            searchBox.setBounds(bounds);
-        });
+// This Function gets the "Locations" information for knockout.
+    function Locations(place) {
+        var Location = {};
+        Location.place_id = place.place_id;
+        Location.position = place.geometry.location.toString();
+        Location.name = place.name;
+        Location.showPlace = ko.observable(true);
+        Location.marker = place.marker;
+
+        if (typeof(place.vicinity) !== undefined) {
+            address = place.vicinity;
+        } else if (typeof(place.formatted_address) !== undefined) {
+            address = place.formatted_address;
+        }
+        Location.address = address;
+
+        vm.placeArray.push(Location);
     }
 
-    // Adds markers to the map.
-    function addMarker(place) {
+// Adds markers to the map.
+function addMarker(place) {
         var img = 'http://maps.google.com/intl/en_us/mapfiles/ms/micons/green-dot.png';
         var marker = new google.maps.Marker({
             map: map,
@@ -117,22 +130,36 @@ function MapViewModel() {
         });
 
         markers.push(marker);
+        place.marker = marker;
         return marker;
-    }
+}
 
-    // Get results for each location.
-    function callback(results, status) {
-        if (status == google.maps.places.PlacesServiceStatus.OK) {
-            bounds = new google.maps.LatLngBounds();
-            results.forEach(function(place) {
-                place.marker = addMarker(place);
-                bounds.extend(new google.maps.LatLng(
-                    place.geometry.location.lat(),
-                    place.geometry.location.lng()));
-            });
-            map.fitBounds(bounds);
-            results.forEach(Locations);
+function MapViewModel() {
+    var self = this;
+    var Input = document.getElementById('input');
+
+    // The array for knockout.
+    self.placeArray = ko.observableArray([]);
+    self.query = ko.observable('');
+
+    // Filter markers
+    var input = ko.computed(function() {
+        var inputValue = self.query
+        for (var i = 0; i < self.placeArray().length; i++) {
+            if (self.placeArray()[i].name.toLowerCase().indexOf(inputValue.toLowerCase()) >= 0) {
+                self.placeArray()[i].showPlace(true);
+            } else {
+                self.placeArray()[i].showPlace(false);
+            }
         }
+    });
+
+    // Removes the markers from the map when user chose an autocomplete search.
+    function clearMarkers() {
+        for (var i = 0; i < markers.length; i++) {
+            markers[i].setMap(null);
+        }
+        markers = [];
     }
 
     // Ensures infowindow opens when click.
@@ -153,23 +180,6 @@ function MapViewModel() {
             marker.setAnimation(google.maps.Animation.DROP);
         }, 300);
     };
-
-    // This Function gets the "Locations" information for knockout.
-    function Locations(place) {
-        var Location = {};
-        Location.place_id = place.place_id;
-        Location.position = place.geometry.location.toString();
-        Location.name = place.name;
-
-        if (typeof(place.vicinity) !== undefined) {
-            address = place.vicinity;
-        } else if (typeof(place.formatted_address) !== undefined) {
-            address = place.formatted_address;
-        }
-        Location.address = address;
-
-        self.placeArray.push(Location);
-    }
 
     // The string to hold foursquare API.
     self.fourSquareAPI = '';
@@ -203,24 +213,14 @@ function MapViewModel() {
             }
         }).fail(function(jqxhr, textStatus, error) {
             var err = textStatus + ", " + error;
-            console.log("This Request Failed, please reload. Error:" + err);
+            console.log("Request Failed, please reload. Error:" + err);
         });
     };
-
-
-    // Ensures the location bounds get updated when the page is resized.
-    google.maps.event.addDomListener(window, 'resize', function() {
-        map.setCenter(nyc);
-    });
-
-    // This executes the "initMap" function after the window loads.
-    google.maps.event.addDomListener(window, 'load', initMap);
-
 }
 
-$(function() {
-    ko.applyBindings(new MapViewModel());
-});
+
+var vm = new MapViewModel ()
+ko.applyBindings(vm);
 
 //Get current NYC Weather in Farenheint
 var url = 'https://query.yahooapis.com/v1/public/yql';
