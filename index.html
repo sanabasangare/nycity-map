@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no'>
-    <title>NYC | Subway & Attractions Map</title>
+    <title>* NYC | Subway & Attractions Map</title>
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="css/icons.css">
     <!-- Bootstrap -->
@@ -19,11 +19,11 @@
     </div>
     <div id="map"></div>
     <div class='filter-ctrl'>
-        <input id='input' name='filter' placeholder='Filter by name...' data-bind="value: query, valueUpdate: 'keyup'"/>
+        <input id='input' name='filter' placeholder='Filter by location...' data-bind="value: query, valueUpdate: 'keyup'"/>
     </div>
     <div id="list">
         <ul data-bind="foreach: placeArray">
-            <li data-bind="click: $parent.clickMarker" class="list-group-item" id="item">
+            <li data-bind="click: $parent.clickMarker, visible: showPlace" class="list-group-item" id="item">
                 <p class="attractions"><span data-bind="text: name"></span></p>
                 <p class="address"><span data-bind="text: address"></span></p>
             </li>
@@ -107,10 +107,6 @@
         <div class="weather_text"></div>
     </div>
 
-    <!-- loading google maps asynchronously -->
-    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCGghI-51R1zyUw9n8V5-kBWkuBMUKzwdM&libraries=places&callback=initMap">
-    </script>
-
     <script>
     //Set google map API with its properties like map center, default map type, zoom etc...
     function initMap() {
@@ -131,7 +127,10 @@
     <!-- Jquery Libraries -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
 
-    <script src="js/main.js"></script>
+    <script src="js/app.js"></script>
+    <!-- loading google maps asynchronously -->
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCGghI-51R1zyUw9n8V5-kBWkuBMUKzwdM&libraries=places&callback=initMap">
+    </script>
 </body>
 
 </html>
