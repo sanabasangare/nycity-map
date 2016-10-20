@@ -35,29 +35,29 @@ function initMap() {
 
     var input = (document.getElementById('input'));
     map.controls[google.maps.ControlPosition.TOP_RIGHT].push(input);
-    var searchBox = new google.maps.places.SearchBox((input));
+    // var searchBox = new google.maps.places.SearchBox((input));
 
-    google.maps.event.addListener(searchBox, 'places_changed', function() {
-        var places = searchBox.getPlaces();
-        clearMarkers();
-        self.placeArray.removeAll();
-        var bounds = new google.maps.LatLngBounds();
+    // google.maps.event.addListener(searchBox, 'places_changed', function() {
+    //     var places = searchBox.getPlaces();
+    //     clearMarkers();
+    //     self.placeArray.removeAll();
+    //     var bounds = new google.maps.LatLngBounds();
 
-        for (var i = 0, place; i <= 10; i++) {
-            if (places[i] !== undefined) {
-                place = places[i];
-                Locations(place);
-                addMarker(place);
-                bounds.extend(place.geometry.location);
-            }
-        }
-        map.fitBounds(bounds);
+    //     for (var i = 0, place; i <= 10; i++) {
+    //         if (places[i] !== undefined) {
+    //             place = places[i];
+    //             Locations(place);
+    //             addMarker(place);
+    //             bounds.extend(place.geometry.location);
+    //         }
+    //     }
+    //     map.fitBounds(bounds);
 
-    });
-    google.maps.event.addListener(map, 'bounds_changed', function() {
-        var bounds = map.getBounds();
-        searchBox.setBounds(bounds);
-    });
+    // });
+    // google.maps.event.addListener(map, 'bounds_changed', function() {
+    //     var bounds = map.getBounds();
+    //     searchBox.setBounds(bounds);
+    // });
 
     // Ensures the location bounds get updated when the page is resized.
     google.maps.event.addDomListener(window, 'resize', function() {
@@ -146,7 +146,7 @@ function MapViewModel() {
     var input = ko.computed(function() {
         var inputValue = self.query
         for (var i = 0; i < self.placeArray().length; i++) {
-            if (self.placeArray()[i].name.toLowerCase().indexOf(inputValue.toLowerCase()) >= 0) {
+            if (self.placeArray()[i].name.toLowerCase().indexOf(inputValue()) >= 0) {
                 self.placeArray()[i].showPlace(true);
             } else {
                 self.placeArray()[i].showPlace(false);
