@@ -24,6 +24,12 @@ body {
     }
 }
 
+@media only screen and (max-height: 567px) {
+    #input {
+        margin-right: 25%;
+    }
+}
+
 .header {
     background-color: #06F;
     color: #FFF;
@@ -124,4 +130,3 @@ p.address {
     color: #06F;
     padding: 3px;
 }
-
