@@ -2,15 +2,37 @@
 
 #subway-lines {
     position: fixed;
-    bottom: 50px;
+    bottom: 30px;
     left: 10px;
     width: 25px;
+    overflow: auto;
     color: #fff;
 }
 
 #subway-lines ul {
     list-style-type: none;
     padding: 0;
+}
+
+@media only screen and (max-height: 568px) {
+    #subway-lines {
+        height: 70%;
+        bottom: 90px;
+    }
+}
+
+@media only screen and (max-height: 415px) {
+    #subway-lines {
+        height: 60%;
+        bottom: 80px;
+    }
+}
+
+@media only screen and (max-height: 320px) {
+    #subway-lines {
+        height: 55%;
+        bottom: 70px;
+    }
 }
 
 .line-selector-icon {
@@ -23,7 +45,6 @@
     vertical-align: middle;
     pointer-events: none;
 }
-
 
 /*************** Subway icons ***************/
 
