@@ -8,9 +8,9 @@ body {
 #input {
     background-color: #FFF;
     color: #06F;
-    height: 30px;
-    width: 20%;
-    margin-top: 15px;
+    height: 25px;
+    width: 125px;
+    margin-top: 10px;
     margin-right: 1%;
     position: fixed;
     padding: 10px;
@@ -20,7 +20,7 @@ body {
 
 @media only screen and (max-width: 590px) {
     #input {
-        width: 150px;
+        width: 120px;
     }
 }
 
