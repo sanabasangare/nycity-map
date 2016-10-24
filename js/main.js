@@ -13,8 +13,8 @@ function initMap() {
     // Look for attractions within 4500 radius.
     var request = {
         location: nyc,
-        radius: 4500,
-        types: ['museum', 'attractions', 'art gallery']
+        radius: 10000,
+        types: ['museum', 'attractions', 'art gallery', 'points of interest']
     };
 
     // MTA Transit data layer
@@ -35,29 +35,6 @@ function initMap() {
 
     var input = (document.getElementById('input'));
     map.controls[google.maps.ControlPosition.TOP_RIGHT].push(input);
-    // var searchBox = new google.maps.places.SearchBox((input));
-
-    // google.maps.event.addListener(searchBox, 'places_changed', function() {
-    //     var places = searchBox.getPlaces();
-    //     clearMarkers();
-    //     self.placeArray.removeAll();
-    //     var bounds = new google.maps.LatLngBounds();
-
-    //     for (var i = 0, place; i <= 10; i++) {
-    //         if (places[i] !== undefined) {
-    //             place = places[i];
-    //             Locations(place);
-    //             addMarker(place);
-    //             bounds.extend(place.geometry.location);
-    //         }
-    //     }
-    //     map.fitBounds(bounds);
-
-    // });
-    // google.maps.event.addListener(map, 'bounds_changed', function() {
-    //     var bounds = map.getBounds();
-    //     searchBox.setBounds(bounds);
-    // });
 
     // Ensures the location bounds get updated when the page is resized.
     google.maps.event.addDomListener(window, 'resize', function() {
@@ -67,71 +44,80 @@ function initMap() {
 
 // Get results for each location.
 function callback(results, status) {
-        if (status == google.maps.places.PlacesServiceStatus.OK) {
-            bounds = new google.maps.LatLngBounds();
-            results.forEach(function(place) {
-                place.marker = addMarker(place);
-                bounds.extend(new google.maps.LatLng(
-                    place.geometry.location.lat(),
-                    place.geometry.location.lng()));
-            });
-            map.fitBounds(bounds);
-            results.forEach(Locations);
-        }
+    if (status == google.maps.places.PlacesServiceStatus.OK) {
+        bounds = new google.maps.LatLngBounds();
+        results.forEach(function(place) {
+            place.marker = addMarker(place);
+            bounds.extend(new google.maps.LatLng(
+                place.geometry.location.lat(),
+                place.geometry.location.lng()));
+            Locations(place);
+        });
+        map.fitBounds(bounds);
+        //results.forEach(Locations);
+    }
 }
 
 // This Function gets the "Locations" information for knockout.
-    function Locations(place) {
-        var Location = {};
-        Location.place_id = place.place_id;
-        Location.position = place.geometry.location.toString();
-        Location.name = place.name;
-        Location.showPlace = ko.observable(true);
-        Location.marker = place.marker;
+function Locations(place) {
+    var Location = {};
+    Location.place_id = place.place_id;
+    Location.position = place.geometry.location.toString();
+    Location.name = place.name;
+    Location.showPlace = ko.observable(true);
+    Location.marker = place.marker;
 
-        if (typeof(place.vicinity) !== undefined) {
-            address = place.vicinity;
-        } else if (typeof(place.formatted_address) !== undefined) {
-            address = place.formatted_address;
-        }
-        Location.address = address;
-
-        vm.placeArray.push(Location);
+    if (typeof(place.vicinity) !== undefined) {
+        address = place.vicinity;
+    } else if (typeof(place.formatted_address) !== undefined) {
+        address = place.formatted_address;
     }
+    Location.address = address;
+
+    vm.placeArray.push(Location);
+}
 
 // Adds markers to the map.
 function addMarker(place) {
-        var img = 'http://maps.google.com/intl/en_us/mapfiles/ms/micons/green-dot.png';
-        var marker = new google.maps.Marker({
-            map: map,
-            name: place.name,
-            position: place.geometry.location,
-            place_id: place.place_id,
-            animation: google.maps.Animation.DROP,
-            icon: img
-        });
+    var img = 'http://maps.google.com/intl/en_us/mapfiles/ms/micons/green-dot.png';
+    var marker = new google.maps.Marker({
+        map: map,
+        name: place.name,
+        position: place.geometry.location,
+        place_id: place.place_id,
+        animation: google.maps.Animation.DROP,
+        icon: img
+    });
 
-        if (place.vicinity !== undefined) {
-            address = place.vicinity;
-        } else if (place.formatted_address !== undefined) {
-            address = place.formatted_address;
-        }
-        var contentString = '<div class="strong">' + place.name + '</div><div>' + address + '</div>';
+    if (place.vicinity !== undefined) {
+        address = place.vicinity;
+    } else if (place.formatted_address !== undefined) {
+        address = place.formatted_address;
+    }
+    var contentString = '<div class="strong">' + place.name + '</div><div>' + address + '</div>';
 
-        google.maps.event.addListener(marker, 'click', function() {
-            infowindow.setContent(contentString);
-            infowindow.open(map, this);
-            map.panTo(marker.position);
-            marker.setAnimation(google.maps.Animation.BOUNCE);
-            setTimeout(function() {
-                marker.setAnimation(null);
-            }, 1600);
+    google.maps.event.addListener(marker, 'click', function() {
+        infowindow.setContent(contentString);
+        infowindow.open(map, this);
+        map.panTo(marker.position);
+        marker.setAnimation(google.maps.Animation.BOUNCE);
+        setTimeout(function() {
+            marker.setAnimation(null);
+        }, 1600);
 
-        });
+    });
 
-        markers.push(marker);
-        place.marker = marker;
-        return marker;
+    markers.push(marker);
+    place.marker = marker;
+    return marker;
+}
+
+// Removes the markers from the map when user chose an autocomplete search.
+function clearMarkers() {
+    for (var i = 0; i < markers.length; i++) {
+        markers[i].setMap(null);
+    }
+    markers = [];
 }
 
 function MapViewModel() {
@@ -148,19 +134,13 @@ function MapViewModel() {
         for (var i = 0; i < self.placeArray().length; i++) {
             if (self.placeArray()[i].name.toLowerCase().indexOf(inputValue()) >= 0) {
                 self.placeArray()[i].showPlace(true);
+                markers[i].setMap(map);
             } else {
                 self.placeArray()[i].showPlace(false);
+                markers[i].setMap(null);
             }
         }
     });
-
-    // Removes the markers from the map when user chose an autocomplete search.
-    function clearMarkers() {
-        for (var i = 0; i < markers.length; i++) {
-            markers[i].setMap(null);
-        }
-        markers = [];
-    }
 
     // Ensures infowindow opens when click.
     self.clickMarker = function(place) {
@@ -219,7 +199,7 @@ function MapViewModel() {
 }
 
 
-var vm = new MapViewModel ()
+var vm = new MapViewModel()
 ko.applyBindings(vm);
 
 //Get current NYC Weather in Farenheint
