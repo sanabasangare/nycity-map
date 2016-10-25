@@ -253,6 +253,8 @@ $.ajax({
 
             c.appendTo($('body'));
         }
+    }).fail(function(jqxhr) {
+        alert("The weather forecast could not be updated, please refresh.");
     });
 
 
