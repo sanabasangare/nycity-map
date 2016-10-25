@@ -130,7 +130,7 @@ function MapViewModel() {
 
     // Filter markers
     var input = ko.computed(function() {
-        var inputValue = self.query
+        var inputValue = self.query;
         for (var i = 0; i < self.placeArray().length; i++) {
             if (self.placeArray()[i].name.toLowerCase().indexOf(inputValue()) >= 0) {
                 self.placeArray()[i].showPlace(true);
@@ -223,7 +223,6 @@ $.ajax({
     .success(function(data) {
         if (data.query.count > 1) {
             jQuery.each(data.query.results.channel, function(idx, result) {
-                console.log(idx);
                 var f = result.item.forecast;
                 var u = result.units.temperature;
 
