@@ -94,7 +94,7 @@ function addMarker(place) {
     } else if (place.formatted_address !== undefined) {
         address = place.formatted_address;
     }
-    var contentString = '<div class="strong">' + place.name + '</div><div>' + address + '</div>';
+    var contentString = '<div class="strong">' + place.name + '</div><div>' + address + '</div>' + self.fourSquareAPI;
 
     google.maps.event.addListener(marker, 'click', function() {
         infowindow.setContent(contentString);
@@ -191,15 +191,14 @@ function MapViewModel() {
             } else {
                 self.fourSquareAPI += 'Phone not available' + ' ';
             }
-        }).fail(function(jqxhr, textStatus, error) {
-            var err = textStatus + ", " + error;
-            console.log("Request Failed, please reload. Error:" + err);
+        }).fail(function(jqxhr) {
+            alert("A location info request Failed, please reload.");
         });
     };
 }
 
 
-var vm = new MapViewModel()
+var vm = new MapViewModel();
 ko.applyBindings(vm);
 
 //Get current NYC Weather in Farenheint
