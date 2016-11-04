@@ -6,6 +6,9 @@ var address;
 var Location = {};
 var nyc;
 
+// The string to hold foursquare API.
+self.fourSquareAPI = '';
+
 // This function loads the map.
 function initMap() {
     nyc = new google.maps.LatLng(40.761275, -73.965567);
@@ -86,19 +89,14 @@ function addMarker(place) {
         position: place.geometry.location,
         place_id: place.place_id,
         animation: google.maps.Animation.DROP,
-        icon: img
+        icon: img,
     });
 
-    if (place.vicinity !== undefined) {
-        address = place.vicinity;
-    } else if (place.formatted_address !== undefined) {
-        address = place.formatted_address;
-    }
-    var contentString = '<div class="strong">' + place.name + '</div><div>' + address + '</div>' + self.fourSquareAPI;
-
     google.maps.event.addListener(marker, 'click', function() {
+        var contentString = '<div style="font-weight: 600">' + place.name + '</div><div>' + address + '</div>' + self.fourSquareAPI;
+            console.log(contentString);
         infowindow.setContent(contentString);
-        infowindow.open(map, this);
+        infowindow.open(map, marker);
         map.panTo(marker.position);
         marker.setAnimation(google.maps.Animation.BOUNCE);
         setTimeout(function() {
@@ -161,9 +159,6 @@ function MapViewModel() {
         }, 300);
     };
 
-    // The string to hold foursquare API.
-    self.fourSquareAPI = '';
-
     // Foursquare API
     this.getFoursquareInfo = function(point) {
         var foursquare = 'https://api.foursquare.com/v2/venues/search' +
@@ -173,7 +168,7 @@ function MapViewModel() {
             '&query=\'' + point['name'] + '\'&limit=10' +
             '&v=20161016';
 
-        //Start ajax and get venues name, phone number and website.
+        //Start ajax and get venues name and phone number.
         $.getJSON(foursquare).done(function(response) {
             self.fourSquareAPI = '<hr>' + '<u>Foursquare Info:</u>' + '<br>';
             var venue = response.response.venues[0];
