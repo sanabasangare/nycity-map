@@ -7,7 +7,7 @@ var Location = {};
 var nyc;
 
 // The string to hold foursquare API.
-self.fourSquareAPI = '';
+foursquareString = '';
 
 // This function loads the map.
 function initMap() {
@@ -50,7 +50,6 @@ function callback(results, status) {
     if (status == google.maps.places.PlacesServiceStatus.OK) {
         bounds = new google.maps.LatLngBounds();
         results.forEach(function(place) {
-            place.marker = addMarker(place);
             bounds.extend(new google.maps.LatLng(
                 place.geometry.location.lat(),
                 place.geometry.location.lng()));
@@ -69,6 +68,7 @@ function Locations(place) {
     Location.name = place.name;
     Location.showPlace = ko.observable(true);
     Location.marker = place.marker;
+    Location.position = place.geometry.location;
 
     if (typeof(place.vicinity) !== undefined) {
         address = place.vicinity;
@@ -76,37 +76,30 @@ function Locations(place) {
         address = place.formatted_address;
     }
     Location.address = address;
+    Location.marker = addMarker(Location);
 
     vm.placeArray.push(Location);
 }
 
 // Adds markers to the map.
-function addMarker(place) {
+function addMarker(Location) {
     var img = 'http://maps.google.com/intl/en_us/mapfiles/ms/micons/green-dot.png';
     var marker = new google.maps.Marker({
         map: map,
-        name: place.name,
-        position: place.geometry.location,
-        place_id: place.place_id,
+        name: Location.name,
+        position: Location.position,
+        place_id: Location.place_id,
         animation: google.maps.Animation.DROP,
         icon: img,
     });
 
     google.maps.event.addListener(marker, 'click', function() {
-        var contentString = '<div style="font-weight: 600">' + place.name + '</div><div>' + address + '</div>' + self.fourSquareAPI;
-            console.log(contentString);
-        infowindow.setContent(contentString);
-        infowindow.open(map, marker);
         map.panTo(marker.position);
-        marker.setAnimation(google.maps.Animation.BOUNCE);
-        setTimeout(function() {
-            marker.setAnimation(null);
-        }, 1600);
+        getFoursquareInfo(Location, marker);
 
     });
 
     markers.push(marker);
-    place.marker = marker;
     return marker;
 }
 
@@ -118,6 +111,7 @@ function clearMarkers() {
     markers = [];
 }
 
+//Main map view model.
 function MapViewModel() {
     var self = this;
     var Input = document.getElementById('input');
@@ -142,55 +136,49 @@ function MapViewModel() {
 
     // Ensures infowindow opens when click.
     self.clickMarker = function(place) {
-        var marker;
-        for (var i = 0; i < markers.length; i++) {
-            if (place.place_id === markers[i].place_id) {
-                marker = markers[i];
-            }
-        }
-        self.getFoursquareInfo(place);
-        map.panTo(marker.position);
-
-        setTimeout(function() {
-            var contentString = '<div style="font-weight: 600">' + place.name + '</div><div>' + place.address + '</div>' + self.fourSquareAPI;
-            infowindow.setContent(contentString);
-            infowindow.open(map, marker);
-            marker.setAnimation(google.maps.Animation.DROP);
-        }, 300);
-    };
-
-    // Foursquare API
-    this.getFoursquareInfo = function(point) {
-        var foursquare = 'https://api.foursquare.com/v2/venues/search' +
-            '?client_id=2KVAKQAUDSURSUZUEIR0BEMGXOEU3KUB4TLV2GWZ4I2UGFTE' +
-            '&client_secret=JIJBDDQOFGOCJLZ2PAICTU134SDLECEJSH0G3R5BT14HVDVN' +
-            '&ll=40.761275,-73.965567' +
-            '&query=\'' + point['name'] + '\'&limit=10' +
-            '&v=20161016';
-
-        //Start ajax and get venues name and phone number.
-        $.getJSON(foursquare).done(function(response) {
-            self.fourSquareAPI = '<hr>' + '<u>Foursquare Info:</u>' + '<br>';
-            var venue = response.response.venues[0];
-            var venueName = venue.name;
-
-            if (venueName !== null && venueName !== undefined) {
-                self.fourSquareAPI += 'Name: ' + venueName + '<br>';
-            } else {
-                self.fourSquareAPI += venue.name;
-            }
-
-            var phoneNumber = venue.contact.formattedPhone;
-            if (phoneNumber !== null && phoneNumber !== undefined) {
-                self.fourSquareAPI += 'Phone: ' + phoneNumber + ' ';
-            } else {
-                self.fourSquareAPI += 'Phone not available' + ' ';
-            }
-        }).fail(function(jqxhr) {
-            alert("A location info request Failed, please reload.");
-        });
+        google.maps.event.trigger(place.marker, 'click');
     };
 }
+
+// Foursquare API
+var getFoursquareInfo = function(point, marker) {
+    var foursquare = 'https://api.foursquare.com/v2/venues/search' +
+        '?client_id=2KVAKQAUDSURSUZUEIR0BEMGXOEU3KUB4TLV2GWZ4I2UGFTE' +
+        '&client_secret=JIJBDDQOFGOCJLZ2PAICTU134SDLECEJSH0G3R5BT14HVDVN' +
+        '&ll=40.761275,-73.965567' +
+        '&query=\'' + point['name'] + '\'&limit=10' +
+        '&v=20161016';
+
+    //Start ajax and get venues name and phone number.
+    $.getJSON(foursquare).done(function(response) {
+        var foursquareString = '<hr>' + '<u>Foursquare Info:</u>' + '<br>';
+        var venue = response.response.venues[0];
+        var venueName = venue.name;
+
+        if (venueName !== null && venueName !== undefined) {
+            foursquareString += 'Name: ' + venueName + '<br>';
+        } else {
+            foursquareString += venue.name;
+        }
+
+        var phoneNumber = venue.contact.formattedPhone;
+        if (phoneNumber !== null && phoneNumber !== undefined) {
+            foursquareString += 'Phone: ' + phoneNumber + ' ';
+        } else {
+            foursquareString += 'Phone not available' + ' ';
+        }
+
+        var contentString = '<div style="font-weight: 600">' + point.name + '</div><div>' + point.address + '</div>' + foursquareString;
+            infowindow.setContent(contentString);
+            infowindow.open(map, marker);
+            marker.setAnimation(google.maps.Animation.BOUNCE);
+        setTimeout(function() {
+            marker.setAnimation(null);
+        }, 2100);
+    }).fail(function(jqxhr) {
+        alert("A location info request Failed, please reload.");
+    });
+};
 
 
 var vm = new MapViewModel();
@@ -249,8 +237,6 @@ $.ajax({
     }).fail(function(jqxhr) {
         alert("The weather forecast could not be updated, please refresh.");
     });
-
-
 
 $(document).ready(function() {
     $("input").keydown(function() {
