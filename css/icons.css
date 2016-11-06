@@ -14,6 +14,13 @@
     padding: 0;
 }
 
+@media only screen and (max-height: 668px) {
+    #subway-lines {
+        height: 70%;
+        bottom: 100px;
+    }
+}
+
 @media only screen and (max-height: 568px) {
     #subway-lines {
         height: 70%;
