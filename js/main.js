@@ -32,9 +32,14 @@ function initMap() {
 
     // list the attractions.
     var list = (document.getElementById('list'));
+    map.controls[google.maps.ControlPosition.TOP_RIGHT].push(list);
 
-
-    map.controls[google.maps.ControlPosition.RIGHT_CENTER].push(list);
+    // Toggle the list & input.
+    var toggle  = document.getElementById("toggle");
+    toggle.addEventListener("click", function(){
+        list.style.display = (list.dataset.toggled ^= 1) ? "block" : "none";
+        input.style.display = (input.dataset.toggled ^= 1) ? "block" : "none";
+    }, false);
 
     var input = (document.getElementById('input'));
     map.controls[google.maps.ControlPosition.TOP_RIGHT].push(input);
