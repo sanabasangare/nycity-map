@@ -19,7 +19,7 @@
     </div>
     <div id="map"></div>
     <div class='filter-ctrl'>
-        <input id='input' name='filter' placeholder='Filter by location' data-bind="value: query, valueUpdate: 'keyup'"/>
+        <input id='input' name='filter' placeholder='Filter venues' data-bind="value: query, valueUpdate: 'keyup'"/>
     </div>
     <div id="list">
         <ul data-bind="foreach: placeArray">
@@ -29,6 +29,7 @@
             </li>
         </ul>
     </div>
+    <button id="toggle">☰ Attractions</button>
     <div id="subway-lines">
         <ul>
             <li>
