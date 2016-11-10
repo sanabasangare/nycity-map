@@ -35,8 +35,8 @@ function initMap() {
     map.controls[google.maps.ControlPosition.TOP_RIGHT].push(list);
 
     // Toggle the list & input.
-    var toggle  = document.getElementById("toggle");
-    toggle.addEventListener("click", function(){
+    var toggle = document.getElementById("toggle");
+    toggle.addEventListener("click", function() {
         list.style.display = (list.dataset.toggled ^= 1) ? "block" : "none";
         input.style.display = (input.dataset.toggled ^= 1) ? "block" : "none";
     }, false);
@@ -65,7 +65,7 @@ function callback(results, status) {
     }
 }
 
-// This Function gets the "Locations" information for knockout.
+// This Function gets the "Location" information for knockout.
 function Locations(place) {
     var Location = {};
     Location.place_id = place.place_id;
@@ -108,13 +108,12 @@ function addMarker(Location) {
     return marker;
 }
 
-// Removes the markers from the map when user chose an autocomplete search.
+// This removes the markers from the map when user chose an autocomplete search.
 function clearMarkers() {
-    for (var i = 0; i < markers.length; i++) {
-        markers[i].setMap(null);
-    }
-    markers = [];
+    markers.forEach(function(marker) {});
+    setVisible(true | false)
 }
+markers = [];
 
 //Main map view model.
 function MapViewModel() {
@@ -129,13 +128,10 @@ function MapViewModel() {
     var input = ko.computed(function() {
         var inputValue = self.query;
         for (var i = 0; i < self.placeArray().length; i++) {
-            if (self.placeArray()[i].name.toLowerCase().indexOf(inputValue()) >= 0) {
-                self.placeArray()[i].showPlace(true);
-                markers[i].setMap(map);
-            } else {
-                self.placeArray()[i].showPlace(false);
-                markers[i].setMap(null);
-            }
+            var place = self.placeArray()[i];
+            var match = place.name.toLowerCase().indexOf(inputValue()) >= 0;
+            place.showPlace(match);
+            place.marker.setVisible(match);
         }
     });
 
@@ -158,8 +154,8 @@ var getFoursquareInfo = function(point, marker) {
     $.getJSON(foursquare).done(function(response) {
         var foursquareString = '<hr>' + '<u>Foursquare Info:</u>' + '<br>';
         var venue = response.response.venues[0];
-        var venueName = venue.name;
 
+        var venueName = venue.name;
         if (venueName !== null && venueName !== undefined) {
             foursquareString += 'Name: ' + venueName + '<br>';
         } else {
@@ -174,9 +170,9 @@ var getFoursquareInfo = function(point, marker) {
         }
 
         var contentString = '<div style="font-weight: 600">' + point.name + '</div><div>' + point.address + '</div>' + foursquareString;
-            infowindow.setContent(contentString);
-            infowindow.open(map, marker);
-            marker.setAnimation(google.maps.Animation.BOUNCE);
+        infowindow.setContent(contentString);
+        infowindow.open(map, marker);
+        marker.setAnimation(google.maps.Animation.BOUNCE);
         setTimeout(function() {
             marker.setAnimation(null);
         }, 2100);
@@ -207,7 +203,7 @@ $.ajax({
         method: 'GET',
         dataType: 'json'
     })
-    .success(function(data) {
+    .done(function(data) {
         if (data.query.count > 1) {
             jQuery.each(data.query.results.channel, function(idx, result) {
                 var f = result.item.forecast;
