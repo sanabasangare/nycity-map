@@ -30,4 +30,4 @@ To customize the application:
 
 License
 ----
-MIT
+[MIT (c) Sanaba Sangare](https://github.com/sanabasangare/nycity-map/blob/master/LICENSE)
